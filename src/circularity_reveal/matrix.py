@@ -19,13 +19,13 @@ class ScoreMatrix:
 
     @classmethod
     def from_scores(cls, scores: dict[str, dict[str, float]]) -> "ScoreMatrix":
-        """Build from ``{system: {topic: score}}``, keeping only systems that
-        cover every topic so the block is complete."""
+        """Build from ``{system: {topic: score}}`` over the union of topics. A
+        topic missing for a system is filled with ``0.0``, the customary score
+        for an empty response, so no system or topic is dropped."""
         topics = sorted({t for tv in scores.values() for t in tv})
-        systems = sorted(s for s, tv in scores.items()
-                         if all(t in tv for t in topics))
-        values = np.array([[scores[s][t] for t in topics] for s in systems],
-                          dtype=float)
+        systems = sorted(scores)
+        values = np.array([[scores[s].get(t, 0.0) for t in topics]
+                           for s in systems], dtype=float)
         return cls(tuple(systems), tuple(topics), values)
 
     def means(self) -> dict[str, float]:
@@ -38,20 +38,23 @@ def align(tested: dict[str, dict[str, float]],
           reference: dict[str, dict[str, float]],
           ) -> tuple[ScoreMatrix, ScoreMatrix]:
     """Restrict two leaderboards to their shared systems and to the topics
-    every shared system covers on both, so the two critical differences rest
-    on one common complete block. Returns ``(tested, reference)`` matrices with
-    identical ``systems`` and ``topics``."""
+    graded on both boards, so the two critical differences rest on one common
+    complete block. A topic missing for an individual system is filled with
+    ``0.0``, the customary score for an empty response, rather than dropped.
+    Returns ``(tested, reference)`` matrices with identical ``systems`` and
+    ``topics``."""
     systems = sorted(set(tested) & set(reference))
     if not systems:
         raise ValueError("no systems shared between the two leaderboards")
-    topics = sorted(set.intersection(
-        *(set(tested[s]) & set(reference[s]) for s in systems)))
+    tested_topics = {t for tv in tested.values() for t in tv}
+    reference_topics = {t for tv in reference.values() for t in tv}
+    topics = sorted(tested_topics & reference_topics)
     if not topics:
-        raise ValueError("no topics shared across all shared systems")
+        raise ValueError("no topics graded on both leaderboards")
 
     def matrix(scores: dict[str, dict[str, float]]) -> ScoreMatrix:
-        values = np.array([[scores[s][t] for t in topics] for s in systems],
-                          dtype=float)
+        values = np.array([[scores[s].get(t, 0.0) for t in topics]
+                           for s in systems], dtype=float)
         return ScoreMatrix(tuple(systems), tuple(topics), values)
 
     return matrix(tested), matrix(reference)

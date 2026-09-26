@@ -2,9 +2,11 @@
 leaderboards, with a swap test and a value test."""
 from .matrix import ScoreMatrix, align
 from .reveal import (
+    RevealResult,
     SwapResult,
     ValueResult,
     critical_difference,
+    reveal,
     swap_test,
     theil_sen,
     value_test,
@@ -13,10 +15,12 @@ from .reveal import (
 __all__ = [
     "ScoreMatrix",
     "align",
+    "reveal",
     "critical_difference",
     "theil_sen",
     "swap_test",
     "value_test",
+    "RevealResult",
     "SwapResult",
     "ValueResult",
 ]

@@ -9,7 +9,11 @@ dependencies = ["numpy>=1.24"]
 
 [project.optional-dependencies]
 plot = ["matplotlib>=3.6"]
+autojudge = ["autojudge-evaluate"]
 test = ["pytest"]
+
+[project.scripts]
+circularity-reveal = "circularity_reveal.cli:main"
 
 [build-system]
 requires = ["hatchling"]

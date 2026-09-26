@@ -24,8 +24,17 @@ def test_align_keeps_shared_systems_and_topics():
     b = {"s2": {"t2": 1.0, "t3": 2.0}, "s3": {"t2": 1.0, "t3": 2.0}}
     ta, tb = align(a, b)
     assert ta.systems == ("s2",)
-    assert ta.topics == ("t2",)
+    assert ta.topics == ("t2",)  # graded on both boards
     assert ta.systems == tb.systems and ta.topics == tb.topics
+
+
+def test_align_zero_fills_missing_topics():
+    a = {"s1": {"t1": 3.0, "t2": 2.0}, "s2": {"t1": 1.0}}  # s2 omits t2
+    b = {"s1": {"t1": 3.0, "t2": 2.0}, "s2": {"t1": 1.0, "t2": 0.5}}
+    ta, tb = align(a, b)
+    assert ta.systems == ("s1", "s2") and ta.topics == ("t1", "t2")
+    i, j = ta.systems.index("s2"), ta.topics.index("t2")
+    assert ta.values[i, j] == 0.0  # empty response scored 0, not dropped
 
 
 def test_critical_difference_positive_and_deterministic():

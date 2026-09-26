@@ -53,6 +53,8 @@ def plot_reveal(tested: ScoreMatrix, reference: ScoreMatrix, swap: SwapResult,
     x = tested.values.mean(axis=1)
     y = reference.values.mean(axis=1)
     pos = {s: (float(x[i]), float(y[i])) for i, s in enumerate(tested.systems)}
+    planted = frozenset(s for s in planted if s in pos)
+    potential = frozenset(s for s in potential if s in pos)
     fill = {"both": swap.revealed & value.revealed,
             "swap": swap.revealed - value.revealed,
             "value": value.revealed - swap.revealed}

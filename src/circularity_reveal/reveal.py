@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .matrix import ScoreMatrix
+from .matrix import ScoreMatrix, align
 
 
 def critical_difference(matrix: ScoreMatrix, alpha: float = 0.05,
@@ -130,3 +130,30 @@ def value_test(tested: ScoreMatrix, reference: ScoreMatrix, alpha: float = 0.05,
                 for i, s in enumerate(tested.systems)}
     revealed = frozenset(s for s, r in residual.items() if r > d_e)
     return ValueResult(revealed, a, b, d_e, residual)
+
+
+@dataclass(frozen=True)
+class RevealResult:
+    """Both reveal tests on one leaderboard pair."""
+
+    tested: ScoreMatrix
+    reference: ScoreMatrix
+    swap: SwapResult
+    value: ValueResult
+
+    @property
+    def revealed(self) -> frozenset[str]:
+        """Systems revealed by either test."""
+        return self.swap.revealed | self.value.revealed
+
+
+def reveal(tested_scores: dict[str, dict[str, float]],
+           reference_scores: dict[str, dict[str, float]], *, alpha: float = 0.05,
+           theta_frac: float = 0.20, n_perm: int = 10_000,
+           seed: int = 42) -> RevealResult:
+    """Align two leaderboards, given as ``{system: {topic: score}}``, and run
+    both reveal tests. The one-call library entry point."""
+    tested, reference = align(tested_scores, reference_scores)
+    swap = swap_test(tested, reference, alpha, theta_frac, n_perm, seed)
+    value = value_test(tested, reference, alpha, n_perm, seed)
+    return RevealResult(tested, reference, swap, value)
