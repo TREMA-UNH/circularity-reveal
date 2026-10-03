@@ -19,11 +19,13 @@ unconfirmed wins pass a threshold, 20 percent of all systems by default. The swa
 test assumes nothing about how the two score scales relate, so it needs a diverse
 pool of comparison systems.
 
-**Value test.** A robust affine fit by Theil-Sen regression predicts each
-system's tested score from its reference score. A system is revealed when its
-residual above the fit exceeds a critical difference computed on the per-topic
-residuals. The value test assumes the two banks are affinely related, and it
-catches inflation at any rank, including the top.
+**Value test.** A robust affine fit by Theil-Sen regression on the system
+means predicts each system's tested score from its reference score. A system
+is revealed when its mean residual above that fit exceeds a critical
+difference calibrated on residuals around Theil-Sen lines fit within each
+topic, so the margin reflects topic-to-topic scatter rather than the single
+slope's lack of fit. The value test assumes the two banks are affinely
+related, and it catches inflation at any rank, including the top.
 
 Both critical differences come from the randomized Tukey HSD permutation test and
 rest on the same shared topics, which `align()` enforces.

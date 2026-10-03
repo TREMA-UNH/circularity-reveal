@@ -114,18 +114,32 @@ def value_test(tested: ScoreMatrix, reference: ScoreMatrix, alpha: float = 0.05,
     """Reveal systems that score higher under the tested nugget bank than a
     robust affine fit from the reference predicts. The fit
     ``tested = a + b * reference`` comes from Theil-Sen regression on the system
-    means, and the per-topic residual matrix feeds the same permutation test for
-    a residual critical difference ``d_residual``. A system is revealed when its
-    mean residual exceeds ``d_residual``, one-sided for inflation only. The test
-    assumes the two nugget banks are affinely related, and it catches inflation
-    at any rank, including the top."""
+    means (the line drawn in the plots), and a system's signal is its mean
+    residual, the distance of its mean-score point from that line.
+
+    The residual critical difference ``d_residual`` is calibrated separately and
+    coherently: a Theil-Sen line is fit WITHIN each topic, and the residuals
+    around those per-topic lines feed the permutation test. This measures the
+    genuine topic-to-topic scatter around each topic's own fit, free of the
+    single-slope misfit that residuals off the mean-fit line would otherwise
+    carry. A system is revealed when its mean residual exceeds ``d_residual``,
+    one-sided for inflation only. The test assumes the two nugget banks are
+    affinely related, and it catches inflation at any rank, including the top."""
     _require_aligned(tested, reference)
     mb = tested.values.mean(axis=1)
     mr = reference.values.mean(axis=1)
     a, b = theil_sen(mr, mb)
-    residual_matrix = ScoreMatrix(tested.systems, tested.topics,
-                                  tested.values - (a + b * reference.values))
-    d_e = critical_difference(residual_matrix, alpha, n_perm, seed)
+    # Noise floor: residuals around a line fit within each topic, so d_residual
+    # reflects topic-to-topic scatter rather than the single slope's misfit.
+    per_topic = np.empty_like(tested.values)
+    for t in range(tested.values.shape[1]):
+        xt, yt = reference.values[:, t], tested.values[:, t]
+        a_t, b_t = theil_sen(xt, yt)
+        if not np.isfinite(b_t):          # a topic where the reference is constant
+            b_t, a_t = 0.0, float(np.median(yt))
+        per_topic[:, t] = yt - (a_t + b_t * xt)
+    d_e = critical_difference(
+        ScoreMatrix(tested.systems, tested.topics, per_topic), alpha, n_perm, seed)
     residual = {s: float(mb[i] - (a + b * mr[i]))
                 for i, s in enumerate(tested.systems)}
     revealed = frozenset(s for s, r in residual.items() if r > d_e)
