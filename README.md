@@ -16,7 +16,7 @@ bank, this package runs two independent tests and plots the outcome.
 leaderboard's critical difference, the reference must confirm the win. A system
 is revealed when the reference certifies the opposite ordering, or when its
 unconfirmed wins pass a threshold, 20 percent of all systems by default. The swap
-test assumes nothing about how the two score scales relate, so it needs a diverse
+test makes no assumption about how the two score scales relate, so it needs a diverse
 pool of comparison systems.
 
 **Value test.** A robust affine fit by Theil-Sen regression on the system
@@ -66,7 +66,7 @@ plot_reveal(tested, reference, swap, value,
 ```
 
 `SwapResult` carries the per-system unconfirmed and contradicted counts and the
-two critical differences; `ValueResult` carries the fit, the residual critical
+two critical differences. `ValueResult` carries the fit, the residual critical
 difference, and each system's residual.
 
 ## Command line
@@ -83,7 +83,7 @@ circularity-reveal \
 ```
 
 It prints the systems revealed by each test and the critical differences.
-`--alpha`, `--theta`, `--perm`, and `--seed` tune the tests; `--format` selects a
+`--alpha`, `--theta`, `--perm`, and `--seed` tune the tests. `--format` selects a
 different eval file format.
 
 ## Tests
