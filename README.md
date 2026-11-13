@@ -3,32 +3,36 @@
 Reveal circular systems in LLM-judge evaluation from a pair of nugget-bank
 leaderboards.
 
-A judge is circular when a system scores higher under a nugget bank than its
-quality warrants, because that bank shares its source with the system. Given the
-per-topic scores of every system under a tested nugget bank and under a reference
-bank, this package runs two independent tests and plots the outcome.
+An LLM judge is circular when its nugget bank shares its source with one of the
+systems it grades. Such a system scores higher under that nugget bank than its
+quality warrants. This package takes the per-topic scores of every system under
+a tested nugget bank and under a reference nugget bank, runs two independent
+tests, and plots the outcome.
 
 ![The two reveal tests](https://raw.githubusercontent.com/TREMA-UNH/circularity-reveal/master/docs/tests-schematic.png)
 
-## The two tests
+## The Two Tests
 
-**Swap test.** Whenever a system beats another by more than the tested
-leaderboard's critical difference, the reference must confirm the win. A system
-is revealed when the reference certifies the opposite ordering, or when its
-unconfirmed wins pass a threshold, 20 percent of all systems by default. The swap
-test makes no assumption about how the two score scales relate, so it needs a diverse
-pool of comparison systems.
+**Swap test.** Does the reference nugget bank confirm the wins a system obtains
+under the tested nugget bank? A win is counted whenever a system beats another
+by more than the critical difference of the tested leaderboard. A system is
+revealed when the reference certifies the opposite ordering, or when the number
+of its unconfirmed wins passes a threshold, by default 20 percent of all
+systems. The swap test makes no assumption about how the two score scales
+relate. It therefore needs a diverse pool of comparison systems.
 
-**Value test.** A robust affine fit by Theil-Sen regression on the system
-means predicts each system's tested score from its reference score. A system
-is revealed when its mean residual above that fit exceeds a critical
-difference calibrated on residuals around Theil-Sen lines fit within each
-topic, so the margin reflects topic-to-topic scatter rather than the single
-slope's lack of fit. The value test assumes the two banks are affinely
-related, and it catches inflation at any rank, including the top.
+**Value test.** Is the tested score of a system higher than its reference score
+predicts? A robust affine fit by Theil-Sen regression on the system means
+predicts the tested score of each system from its reference score. A system is
+revealed when its mean residual above that fit exceeds a critical difference.
+This critical difference is calibrated on residuals around Theil-Sen lines fit
+within each topic, so that the margin reflects topic-to-topic scatter instead of
+the lack of fit of the single slope. The value test assumes that the two nugget
+banks are affinely related. It detects inflation at any rank, including the top
+rank.
 
-Both critical differences come from the randomized Tukey HSD permutation test and
-rest on the same shared topics, which `align()` enforces.
+Both critical differences are obtained with the randomized Tukey HSD permutation
+test and are computed on the same shared topics, which `align()` enforces.
 
 ## Install
 
@@ -38,17 +42,19 @@ pip install "circularity-reveal[plot]"      # with the result plot (matplotlib)
 pip install "circularity-reveal[autojudge]" # with the CLI's auto-judge eval-file reader
 ```
 
-The source is at <https://github.com/TREMA-UNH/circularity-reveal>. For a development
-install, clone it and run `pip install -e ".[test,plot]"`.
+The source is available at <https://github.com/TREMA-UNH/circularity-reveal>.
+For a development install, clone the repository and run
+`pip install -e ".[test,plot]"`.
 
 ## License
 
 MIT, see `LICENSE`.
 
-## As a library
+## Use as a Library
 
-A dependent package holds its scores in memory as `{system: {topic: score}}` per
-bank and runs both tests in one call:
+Scores are passed in memory as `{system: {topic: score}}`, one dictionary per
+nugget bank. `reveal()` aligns the two dictionaries and runs both tests in one
+call:
 
 ```python
 from circularity_reveal import reveal
@@ -59,7 +65,8 @@ result.swap.revealed            # swap test alone; d_tested, d_reference, counts
 result.value.revealed           # value test alone; slope, intercept, d_residual
 ```
 
-The pieces are also available on their own, on aligned `ScoreMatrix` pairs:
+Each step is also available on its own and operates on an aligned pair of
+`ScoreMatrix` objects:
 
 ```python
 from circularity_reveal import align, swap_test, value_test, plot_reveal
@@ -72,14 +79,15 @@ plot_reveal(tested, reference, swap, value,
             xlabel="tested bank", ylabel="reference bank")
 ```
 
-`SwapResult` carries the per-system unconfirmed and contradicted counts and the
-two critical differences. `ValueResult` carries the fit, the residual critical
-difference, and each system's residual.
+`SwapResult` holds the two critical differences and, for each system, the
+number of unconfirmed and contradicted wins. `ValueResult` holds the fit, the
+residual critical difference, and the residual of each system.
 
-## Command line
+## Command Line
 
-With the `[autojudge]` extra the CLI reads auto-judge ir_measures eval files
-directly, selecting one bank-stripped measure key:
+With the `[autojudge]` extra, the CLI reads auto-judge ir_measures eval files
+directly. `--measure` selects one measure key, given without its nugget bank
+name:
 
 ```bash
 circularity-reveal \
@@ -89,9 +97,9 @@ circularity-reveal \
   --plot reveal.png --json reveal.json
 ```
 
-It prints the systems revealed by each test and the critical differences.
-`--alpha`, `--theta`, `--perm`, and `--seed` tune the tests. `--format` selects a
-different eval file format.
+The CLI prints the systems revealed by each test and the critical differences.
+The options `--alpha`, `--theta`, `--perm`, and `--seed` adjust the tests, and
+`--format` selects a different eval file format.
 
 ## Tests
 
