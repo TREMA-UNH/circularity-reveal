@@ -57,14 +57,18 @@ dependencies = [
 
 ### Install from Source
 
+There are two ways to install from source. Use one of them.
+
+**Option 1: Clone the repository and install it with pip.**
+
 ```bash
 git clone https://github.com/TREMA-UNH/circularity-reveal.git
 cd circularity-reveal
 pip install -e ".[test,plot]"
 ```
 
-To depend on the source repository from another package, use this entry in its
-`pyproject.toml`:
+**Option 2: Without a clone, add this entry to the `pyproject.toml` of your own
+package.** Installing your package then fetches the source from GitHub.
 
 ```toml
 [project]
