@@ -36,15 +36,42 @@ test and are computed on the same shared topics, which `align()` enforces.
 
 ## Install
 
+### Install from PyPI
+
 ```bash
 pip install circularity-reveal              # core (numpy)
 pip install "circularity-reveal[plot]"      # with the result plot (matplotlib)
 pip install "circularity-reveal[autojudge]" # with the CLI's auto-judge eval-file reader
 ```
 
-The source is available at <https://github.com/TREMA-UNH/circularity-reveal>.
-For a development install, clone the repository and run
-`pip install -e ".[test,plot]"`.
+To depend on it from another package, add it to the `pyproject.toml` of that
+package:
+
+```toml
+[project]
+dependencies = [
+    "circularity-reveal>=1.0.0",
+    # or with extras: "circularity-reveal[plot,autojudge]>=1.0.0",
+]
+```
+
+### Install from Source
+
+```bash
+git clone https://github.com/TREMA-UNH/circularity-reveal.git
+cd circularity-reveal
+pip install -e ".[test,plot]"
+```
+
+To depend on the source repository from another package, use this entry in its
+`pyproject.toml`:
+
+```toml
+[project]
+dependencies = [
+    "circularity-reveal @ git+https://github.com/TREMA-UNH/circularity-reveal.git",
+]
+```
 
 ## License
 
