@@ -32,4 +32,4 @@ except ImportError:  # matplotlib is an optional extra
 else:
     __all__.append("plot_reveal")
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"

@@ -1,16 +1,29 @@
 [project]
 name = "circularity-reveal"
-version = "0.1.0"
+version = "1.0.0"
 description = "Reveal circular systems in LLM-judge evaluation from paired nugget-bank leaderboards."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
+authors = [{ name = "TREMA-UNH" }]
+keywords = ["evaluation", "LLM judge", "circularity", "information retrieval", "RAG"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
 dependencies = ["numpy>=1.24"]
 
 [project.optional-dependencies]
 plot = ["matplotlib>=3.6"]
 autojudge = ["autojudge-evaluate"]
 test = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/TREMA-UNH/circularity-reveal"
+Repository = "https://github.com/TREMA-UNH/circularity-reveal"
+Issues = "https://github.com/TREMA-UNH/circularity-reveal/issues"
 
 [project.scripts]
 circularity-reveal = "circularity_reveal.cli:main"

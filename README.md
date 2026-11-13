@@ -8,7 +8,7 @@ quality warrants, because that bank shares its source with the system. Given the
 per-topic scores of every system under a tested nugget bank and under a reference
 bank, this package runs two independent tests and plots the outcome.
 
-![The two reveal tests](docs/tests-schematic.png)
+![The two reveal tests](https://raw.githubusercontent.com/TREMA-UNH/circularity-reveal/master/docs/tests-schematic.png)
 
 ## The two tests
 
@@ -33,10 +33,17 @@ rest on the same shared topics, which `align()` enforces.
 ## Install
 
 ```bash
-pip install -e .              # core (numpy)
-pip install -e .[plot]        # with the result plot (matplotlib)
-pip install -e .[autojudge]   # with the CLI's auto-judge eval-file reader
+pip install circularity-reveal              # core (numpy)
+pip install "circularity-reveal[plot]"      # with the result plot (matplotlib)
+pip install "circularity-reveal[autojudge]" # with the CLI's auto-judge eval-file reader
 ```
+
+The source is at <https://github.com/TREMA-UNH/circularity-reveal>. For a development
+install, clone it and run `pip install -e ".[test,plot]"`.
+
+## License
+
+MIT, see `LICENSE`.
 
 ## As a library
 
